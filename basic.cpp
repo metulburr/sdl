@@ -1,94 +1,90 @@
+
+#include <SDL2/SDL.h>
 #include <iostream>
-#include "SDL/SDL.h"
 
-// -lSDL
-
-class Window{
+class Control{
     public:
-        int width, height, bpp;
-        Uint32 flags;
-        SDL_Surface* _window;
+        SDL_Window* window = 0;
+        SDL_Renderer* renderer = 0;
         std::string title;
-    
-        Window(){
-            width = 0;
-            height = 0;
-            bpp = 0;
-            _window = NULL;
-            title = " ";
-        }
+        int width = 0, height = 0;
+        bool running = true, fullscreen;
         
-        void set_title(std::string title){
-            this->title = title;
-            SDL_WM_SetCaption(title.c_str(), NULL);
-        }
-        
-        bool init(int width, int height, int bpp, Uint32 flags){
-            this->width = width;
-            this->height = height;
-            this->bpp = bpp;
-            this->flags = flags;
-            if ((_window = SDL_SetVideoMode(width, height, bpp, flags)) == NULL){
-                return false;
+        Control(std::string titlename, int window_width=0, int window_height=0, bool fullscr=false)
+        : title(titlename), width(window_width), height(window_height), fullscreen(fullscr){
+            if ( ! init()){
+                //problem
             }
-            return true;
-            
         }
-};
-
-
-class Application{
-    public:
-        bool done;
-        Window window;
-    
-        Application(){
-            done = false;
+        
+        ~Control(){
+            clean();
         }
-        ~Application(){
-            
+        
+        void clean(){
+            SDL_DestroyWindow(window);
+            SDL_DestroyRenderer(renderer);
+            SDL_Quit();
         }
-    
+        
         bool init(){
-            if (SDL_Init(SDL_INIT_EVERYTHING) != 0){
+            if (SDL_Init(SDL_INIT_EVERYTHING) == 0){
+                int flags = 0;
+                if (fullscreen){
+                    flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+                }
+                window = SDL_CreateWindow(title.c_str(),
+                    SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+                    width, height,
+                    flags);
+                if (window != 0){
+                    renderer = SDL_CreateRenderer(window, -1, 0);
+                }
+            }
+            else{
                 return false;
             }
-            if (window.init(800,600, 32, SDL_SWSURFACE) != true){
-                return false;
-            }
-            window.set_title("SDL window");
-            
             return true;
         }
-        void run(){
-            while( ! done){
-                SDL_Delay(5000);
-                done = true;
+        
+        void events(){
+            SDL_Event event;
+            if (SDL_PollEvent(&event)){
+                switch (event.type){
+                    case SDL_QUIT:
+                        running = false;
+                        break;
+                    case SDL_KEYDOWN:
+                        running = false;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-        void input(SDL_Event* event){
-            
-        }
+        
         void update(){
             
         }
+        
         void render(){
-            
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+            SDL_RenderPresent(renderer);
         }
-        void quit(){
-            SDL_Quit();
+        
+        void run(){
+            while (running){
+                events();
+                update();
+                render();
+                //SDL_Delay(5000);
+                //running = false;
+            }
         }
 };
 
-
 int main(){
-    Application* app;
-    app = new Application();
-    if ( ! app->init())
-        return -1;
-    app->run();
-    app->quit();
-    delete app;
-    app = NULL;
-    
+    Control app("SDL test", 800, 600, false);
+    app.run();
 }
