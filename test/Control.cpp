@@ -1,15 +1,12 @@
 
 #include "Control.h"
+
 //#include <SDL2/SDL.h>
 //#include <SDL2/SDL_image.h>
 #include <iostream>
 
 
 
-
-
-
-        
 Control::Control(std::string titlename, int window_width=0, int window_height=0, bool fullscr=false)
 : title(titlename), width(window_width), height(window_height), fullscreen(fullscr){
     if ( ! init()){
@@ -44,21 +41,8 @@ bool Control::init(){
     else{
         return false;
     }
-    //Img_Load IMG_Load
-    SDL_Surface* temp = IMG_Load("resources/images/waver.png");
-    if (temp == NULL){
-        std::cout << IMG_GetError() << std::endl;
-    }
-    texture = SDL_CreateTextureFromSurface(renderer, temp);
-    if (texture == NULL){
-        std::cout << SDL_GetError() << std::endl;
-    }
-    SDL_FreeSurface(temp);
-    SDL_QueryTexture(texture, NULL, NULL, &source_rect.w, &source_rect.h);
-    dest_rect.x = source_rect.x = 0;
-    dest_rect.y = source_rect.y = 0;
-    dest_rect.w = source_rect.w;
-    dest_rect.h = source_rect.h;
+
+    player.init(renderer);
 
     return true;
 }
@@ -86,7 +70,7 @@ void Control::update(){
 void Control::render(){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, texture, &source_rect, &dest_rect);
+    SDL_RenderCopy(renderer, player.texture, &player.source_rect, &player.dest_rect);
     SDL_RenderPresent(renderer);
 }
 

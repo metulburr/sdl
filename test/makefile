@@ -2,7 +2,7 @@ CC=g++
 CFLAGS=-c -I/usr/include/SDL2 -std=c++11 -Wall
 LDFLAGS=
 FLAGS=-lSDL2 -lSDL2_image
-SOURCES=main.cpp Control.cpp
+SOURCES=main.cpp Control.cpp Character.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=main
 BINDIR=/usr/bin
