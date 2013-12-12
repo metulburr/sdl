@@ -42,7 +42,7 @@ bool Control::init(){
         return false;
     }
 
-    player.init(renderer);
+    //player.init(renderer, "resources/images/waver.png");
 
     return true;
 }
@@ -64,13 +64,14 @@ void Control::events(){
 }
 
 void Control::update(){
-    
+    player.update();
 }
 
 void Control::render(){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, player.texture, &player.source_rect, &player.dest_rect);
+    player.render(renderer);
+    //SDL_RenderCopy(renderer, player.texture, &player.source_rect, &player.dest_rect);
     SDL_RenderPresent(renderer);
 }
 
